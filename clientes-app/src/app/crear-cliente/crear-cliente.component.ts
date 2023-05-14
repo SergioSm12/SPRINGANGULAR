@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 export class CrearClienteComponent implements OnInit {
   public cliente: Cliente = new Cliente(0, '', '', '', '');
   public titulo: string = 'Crear cliente';
+  private errores: string[] = [];
 
   constructor(
     private clienteService: ClientesService,
@@ -34,24 +35,44 @@ export class CrearClienteComponent implements OnInit {
   }
 
   public create(): void {
-    this.clienteService.create(this.cliente).subscribe((response) => {
-      this.router.navigate(['/clientes']);
-      Swal.fire(
-        'Nuevo cliente',
-        `Cliente ${response.nombre} creado con exito`,
-        'success'
-      );
-    });
+    this.clienteService.create(this.cliente).subscribe(
+      (response) => {
+        this.router.navigate(['/clientes']);
+        Swal.fire(
+          'Nuevo cliente',
+          `El cliente ${response.nombre} ha sido creado con éxito!`,
+          'success'
+        );
+      },
+      (err) => {
+        this.errores = err.error.errors as string[];
+        console.error('Codigo del error desde el backend: ' + err.status);
+
+        console.error(err.error.errors);
+      }
+    );
   }
 
   public update(): void {
-    this.clienteService.update(this.cliente).subscribe((cliente) => {
-      this.router.navigate(['/clientes']);
-      Swal.fire(
-        'Cliente Actualizado',
-        `Cliente ${cliente.nombre} Actualizado con exito!`,
-        'success'
-      );
-    });
+    this.clienteService.update(this.cliente).subscribe(
+      (response) => {
+        this.router.navigate(['/clientes']);
+        Swal.fire(
+          'Cliente Actualizado',
+          `${response.mensaje}: ${response.cliente.nombre}`,
+          'success'
+        );
+      },
+      (err) => {
+        this.errores = err.error.errors as string[];
+        console.error('Codigo del error desde el backend: ' + err.status);
+
+        console.error(err.error.errors);
+      }
+    );
+  }
+
+  public get getErrores(): String[]{
+    return this.errores;
   }
 }

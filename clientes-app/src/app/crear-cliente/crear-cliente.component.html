@@ -1,7 +1,13 @@
+<ul class="alert alert-danger" *ngIf="getErrores.length > 0">
+  <li *ngFor="let err of getErrores">
+    {{ err }}
+  </li>
+</ul>
+
 <div class="card text-bg-dark mb-3">
   <div class="card-header">{{ titulo }}</div>
   <div class="card-body">
-    <form>
+    <form #clienteForm="ngForm">
       <div class="row mx-auto">
         <div class="mb-3 col-6">
           <label for="nombre" class="form-label">Nombre</label>
@@ -10,7 +16,19 @@
             type="text"
             [(ngModel)]="cliente.nombre"
             name="nombre"
+            value=""
+            #nombre="ngModel"
           />
+          <!--required minlength="4"-->
+          <div
+            class="alert alert-danger"
+            *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)"
+          >
+            <div *ngIf="nombre.errors?.['required']">Nombre es requerido</div>
+            <div *ngIf="nombre.errors?.['minlength']">
+              Nombre debe tener al menos 4 caracteres
+            </div>
+          </div>
         </div>
         <div class="mb-3 col-6">
           <label for="apellido" class="form-label">Apellido</label>
@@ -19,7 +37,17 @@
             type="text"
             [(ngModel)]="cliente.apellido"
             name="apellido"
+            value=""
+            #apellido="ngModel"
           />
+          <div
+            class="alert alert-danger"
+            *ngIf="apellido.invalid && (apellido.dirty || apellido.touched)"
+          >
+            <div *ngIf="apellido.errors?.['required']">
+              Apellido es requerido
+            </div>
+          </div>
         </div>
       </div>
 
@@ -30,7 +58,16 @@
           type="email"
           [(ngModel)]="cliente.email"
           name="email"
+          value=""
+          #email="ngModel"
         />
+        <div
+          class="alert alert-danger"
+          *ngIf="email.invalid && (email.dirty || email.touched)"
+        >
+          <div *ngIf="email.errors?.['required']">Email es requerido</div>
+          <div *ngIf="email.errors?.['email']">Formato de Correo invalido.</div>
+        </div>
       </div>
 
       <div class="mb-3">
@@ -38,19 +75,21 @@
           class="btn btn-outline-primary"
           role="button"
           (click)="create()"
-          *ngIf="!cliente.id else elseBlock"
+          *ngIf="!cliente.id; else elseBlock"
+          [disabled]="!clienteForm.form.valid"
         >
           Crear
         </button>
 
         <ng-template #elseBlock>
           <button
-          class="btn btn-outline-primary"
-          role="button"
-          (click)="update()"
-        >
-          Actualizar
-        </button>
+            class="btn btn-outline-primary"
+            role="button"
+            (click)="update()"
+            [disabled]="!clienteForm.form.valid"
+          >
+            Actualizar
+          </button>
         </ng-template>
       </div>
     </form>

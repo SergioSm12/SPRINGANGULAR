@@ -2,6 +2,8 @@ import { Cliente } from './../models/cliente';
 import { Component, OnInit } from '@angular/core';
 import { ClientesService } from '../services/clientes.service';
 import Swal from 'sweetalert2';
+import { tap } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-clientes',
@@ -9,14 +11,39 @@ import Swal from 'sweetalert2';
   styleUrls: ['./clientes.component.css'],
 })
 export class ClientesComponent implements OnInit {
-  clientes: Cliente[] = [];
+  public clientes: Cliente[] = [];
+  public paginador: any;
 
-  constructor(private clienteService: ClientesService) {}
+  constructor(
+    private clienteService: ClientesService,
+    private activatedRoute: ActivatedRoute
+  ) {}
 
-  ngOnInit(): void {
-    this.clienteService
-      .getClientes()
-      .subscribe((clientes) => (this.clientes = clientes));
+  ngOnInit() {
+    //Creamos observador que capture el parametro page de la ruta
+    this.activatedRoute.paramMap.subscribe((params) => {
+      //Casteo de la variable que llega como string
+      let page: number = +params.get('page')! | 0;
+
+      //validamos si page no llega
+      if (!page) {
+        page = 0;
+      }
+      this.clienteService
+        .getClientes(page)
+        .pipe(
+          tap((response) => {
+            console.log('ClientesComponent: tap 3');
+            (response.content as Cliente[]).forEach((cliente) => {
+              console.log(cliente.nombre);
+            });
+          })
+        )
+        .subscribe((response) => {
+          this.clientes = response.content as Cliente[];
+          this.paginador = response;
+        });
+    });
   }
 
   delete(cliente: Cliente): void {
