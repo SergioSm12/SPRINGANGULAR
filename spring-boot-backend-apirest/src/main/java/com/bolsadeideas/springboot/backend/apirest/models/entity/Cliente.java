@@ -3,6 +3,7 @@ package com.bolsadeideas.springboot.backend.apirest.models.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
@@ -24,14 +25,19 @@ public class Cliente implements Serializable {
     @Email(message = "contiene un formato de correo invalido.")
     @Column(nullable = false, unique = true)
     private String email;
+    @NotNull(message = " no puede ser nula ")
     @Column(name = "create_at")
     @Temporal(TemporalType.DATE)
     private Date createAt;
 
+    private String foto;
+
+
+/*
     @PrePersist
     public void prePersist() {
         createAt = new Date();
-    }
+    }*/
 
     public Long getId() {
         return id;
@@ -71,6 +77,14 @@ public class Cliente implements Serializable {
 
     public void setCreateAt(Date createAt) {
         this.createAt = createAt;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     private static final Long serialVersionUID = 1L;
