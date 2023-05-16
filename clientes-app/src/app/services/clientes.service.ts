@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Cliente } from '../models/cliente';
-import { CLIENTES } from '../clientes/clientes.json';
 import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Swal from 'sweetalert2';
@@ -54,14 +53,14 @@ export class ClientesService {
   //Get como paginable
   getClientes(page: number): Observable<any> {
     //return of(CLIENTES);
-    return this.http.get(this.urlEndpoint+ '/page/'+ page ).pipe(
+    return this.http.get(this.urlEndpoint + '/page/' + page).pipe(
       tap((response: any) => {
         console.log('ClientesService: tap 1');
         (response.content as Cliente[]).forEach((cliente) => {
           console.log(cliente.nombre);
         });
       }),
-      map((response : any) => {
+      map((response: any) => {
         (response.content as Cliente[]).map((cliente) => {
           cliente.nombre = cliente.nombre.toUpperCase();
           /*
@@ -144,5 +143,21 @@ export class ClientesService {
           return throwError(() => e);
         })
       );
+  }
+
+  subirFoto(archivo: File, id: number): Observable<Cliente> {
+    let formData = new FormData();
+    formData.append('archivo', archivo);
+    formData.append('id', id.toString());
+    return this.http.post(`${this.urlEndpoint}/upload`, formData).pipe(
+      //Recogemos la respuesta traemos el cliente y lo convertimos
+      map((response: any) => response.cliente as Cliente),
+      catchError((e) => {
+        //Capturamos el error
+        console.error(e.error.mensaje);
+        Swal.fire(e.error.mensaje, e.error.error, 'error');
+        return throwError(() => e);
+      })
+    );
   }
 }

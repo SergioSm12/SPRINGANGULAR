@@ -1,0 +1,9 @@
+<div class="card text-bg-dark mb-3">
+  <div class="card-header">{{ titulo }}</div>
+  <div class="card-body">
+    <div class="input-group">
+        <input (change)="seleccionarFoto($event)" type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+        <button (click)="subirFoto()" class="btn btn-primary" type="button" id="inputGroupFileAddon04">Subir</button>
+      </div>
+  </div>
+</div>

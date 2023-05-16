@@ -17,6 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { DetalleClienteComponent } from './detalle-cliente/detalle-cliente.component';
 
 registerLocaleData(localeES, 'es-CO');
 const routes: Routes = [
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'clientes/page/:page', component: ClientesComponent },
   { path: 'clientes/form', component: CrearClienteComponent },
   { path: 'clientes/form/:id', component: CrearClienteComponent },
+  { path: 'clientes/ver/:id', component: DetalleClienteComponent }
 ];
 @NgModule({
   declarations: [
@@ -36,6 +38,7 @@ const routes: Routes = [
     ClientesComponent,
     CrearClienteComponent,
     PaginatorComponent,
+    DetalleClienteComponent,
   ],
   imports: [
     BrowserModule,

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./crear-cliente.component.css'],
 })
 export class CrearClienteComponent implements OnInit {
-  public cliente: Cliente = new Cliente(0, '', '', '', '');
+  public cliente: Cliente = new Cliente(0, '', '', '', '','');
   public titulo: string = 'Crear cliente';
   private errores: string[] = [];
 

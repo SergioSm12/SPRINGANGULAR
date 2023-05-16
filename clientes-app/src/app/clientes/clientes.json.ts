@@ -1,5 +1,5 @@
 import { Cliente } from '../models/cliente';
-
+/*
 export const CLIENTES: Cliente[] = [
   {
     id: 1,
@@ -106,4 +106,4 @@ export const CLIENTES: Cliente[] = [
     createAt: '2022-09-02',
     email: 'dlismere@google.it',
   },
-];
+];*/
