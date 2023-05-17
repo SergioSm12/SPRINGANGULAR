@@ -1,8 +1,9 @@
 import { ClientesService } from './../services/clientes.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Cliente } from '../models/cliente';
-import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
+import { HttpEventType } from '@angular/common/http';
+import { ModalService } from '../services/modal.service';
 
 @Component({
   selector: 'app-detalle-cliente',
@@ -10,20 +11,20 @@ import Swal from 'sweetalert2';
   styleUrls: ['./detalle-cliente.component.css'],
 })
 export class DetalleClienteComponent implements OnInit {
-  public cliente: Cliente;
+  @Input() cliente: Cliente;
   public titulo: string = 'Detalle Cliente';
-  public fotoSeleccionada!: File;
+  public fotoSeleccionada!: File | null;
+  public progreso: number = 0;
 
   constructor(
     private clienteService: ClientesService,
-    private activatedRoute: ActivatedRoute,
+    public modalService: ModalService
   ) {
     this.cliente = new Cliente(0, '', '', '', '', '');
-  
   }
   ngOnInit(): void {
     //Se crea observable que monitora la ruta (paramMap) para capturar el id
-    this.activatedRoute.paramMap.subscribe((params) => {
+    /* this.activatedRoute.paramMap.subscribe((params) => {
       let id: number = +params.get('id')! | 0;
 
       if (id) {
@@ -31,26 +32,60 @@ export class DetalleClienteComponent implements OnInit {
           this.cliente = cliente;
         });
       }
-    });
+    });*/
   }
 
-  
   //Seleccionar foto
-  public seleccionarFoto(event:any) {
+  public seleccionarFoto(event: any) {
     this.fotoSeleccionada = event.target.files[0];
+    this.progreso = 0;
     console.log(this.fotoSeleccionada);
+    if (
+      this.fotoSeleccionada !== null &&
+      this.fotoSeleccionada.type.indexOf('image') < 0
+    ) {
+      Swal.fire(
+        'Error Seleccionar imagen: ',
+        'El archivo debe ser del tipo imagen',
+        'error'
+      );
+      this.fotoSeleccionada = null;
+    }
   }
 
   public subirFoto() {
-    this.clienteService
-      .subirFoto(this.fotoSeleccionada, this.cliente.id)
-      .subscribe((cliente) => {
-        this.cliente = cliente;
-        Swal.fire(
-          'La foto se ha subido completamente!',
-          `La foto se ha subido con exito ${this.cliente.foto}`,
-          'success'
-        );
-      });
+    if (!this.fotoSeleccionada) {
+      Swal.fire('Error Upload: ', 'Debe seleccionar una foto', 'error');
+    } else {
+      this.clienteService
+        .subirFoto(this.fotoSeleccionada, this.cliente.id)
+        .subscribe((event) => {
+          //Barra de progreso
+          if (event.type === HttpEventType.UploadProgress) {
+            this.progreso = Math.round(
+              (event.loaded / (event.total ?? 1)) * 100
+            );
+          } else if (event.type === HttpEventType.Response) {
+            let response: any = event.body;
+            this.cliente = response.cliente as Cliente;
+            
+            //Actualizar imagen tan pronto se sube 
+            this.modalService.notificarUpload.emit(this.cliente);
+
+            
+            Swal.fire(
+              'La foto se ha subido completamente!',
+              response.mensaje,
+              'success'
+            );
+          }
+        });
+    }
+  }
+
+  public cerrarModal() {
+    this.modalService.cerrarModal();
+    this.fotoSeleccionada = null;
+    this.progreso = 0;
   }
 }

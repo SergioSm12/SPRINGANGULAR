@@ -1,3 +1,8 @@
+<!--Implementacion para modal-->
+<app-detalle-cliente
+  *ngIf="clienteSeleccionado.id"
+  [cliente]="clienteSeleccionado"
+></app-detalle-cliente>
 <div class="card border-primary mb-3">
   <div class="card-header">Clientes</div>
   <div class="card-body">
@@ -19,7 +24,7 @@
       >
         <thead>
           <tr>
-            <th>ID</th>
+            <th>#</th>
             <th>Nombre</th>
             <th>Apellido</th>
             <th>Email</th>
@@ -30,11 +35,29 @@
         </thead>
         <tbody>
           <tr *ngFor="let cliente of clientes">
-            <td><button type="button" class="btn btn-info" [routerLink]="['/clientes/ver',cliente.id]">{{ cliente.id }}</button> </td>
+            <td>
+              <img
+                (click)="abrirModal(cliente)"
+                *ngIf="cliente?.foto"
+                src="http://localhost:8080/api/uploads/img/{{ cliente.foto }}"
+                alt="{{ cliente.foto }}"
+                style="width: 64px; cursor: pointer"
+                class="img-thumbnail rounded"
+              />
+              <img
+                (click)="abrirModal(cliente)"
+                *ngIf="!cliente?.foto"
+                src="http://localhost:8080/images/no-usuario.png"
+                alt="Sin foto"
+                style="width: 64px; cursor: pointer"
+                class="img-thumbnail rounded"
+              />
+            </td>
+
             <td>{{ cliente.nombre }}</td>
-            <td>{{ cliente.apellido | uppercase}}</td>
+            <td>{{ cliente.apellido | uppercase }}</td>
             <td>{{ cliente.email }}</td>
-            <td>{{ cliente.createAt | date:"EEEE dd, MMMM yyyy" }}</td>
+            <td>{{ cliente.createAt | date : "EEEE dd, MMMM yyyy" }}</td>
             <td>
               <button
                 class="btn btn-outline-info"
